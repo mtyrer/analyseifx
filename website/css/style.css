@@ -1,0 +1,24 @@
+.btn {
+    width: 200px; 
+    margin-right: 10px;
+    
+
+}
+
+.div-inline{
+    display:inline-block;
+}
+
+#list-diskio { 
+   /* position: absolute; 
+    left: 200px; 
+    right: 10px; 
+    top: 150px; 
+    bottom: 10px; 
+    */
+}
+
+.btnmenulist {
+    height: 400px;
+    overflow-y: scroll;
+}

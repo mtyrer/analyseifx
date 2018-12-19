@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>AnalyseIfx</title>
+    <!-- css -->
+    <link rel="stylesheet" href="libs/bootstrap-4.1.0-dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="libs/dygraph2.1.0/dygraph.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">AnalyseIfx</a>
+        
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item disabled">
+                <a class="nav-link" href="index.html">Charts<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="clientadmin.html">Client Admin<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="chartadmin.html">Chart Admin</a>
+            </li>
+            </ul>
+            
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                
+                <div class="btn-group">
+
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownClientButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div id="btnclient" class="div-inline">
+                                Client : Unset
+                            </div>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropClientMenuButton">
+                            <div id = "ddclient">
+                                <a class="dropdown-item" href="#">Action</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownHostButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div id="btnhost" class="div-inline">
+                                Host : Unset
+                            </div>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownHostButton">
+                            <div id="ddhost">
+
+                                <a class="dropdown-item" href="#">Action</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownInstanceButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div id="btninstance" class="div-inline">
+                                Instance : Unset
+                            </div>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownInstanceButton">
+                            <div id="ddinstance">
+                                
+                                <a class="dropdown-item" href="#">Action</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownDateButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div id="btndate" class="div-inline">
+                                File Date : Unset
+                            </div>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownDateButton">
+                            <div id="dddate">
+                                <a class="dropdown-item" href="#">Action</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-3">  
+                <div class="list-group btnmenulist" id="list-tab" role="tablist">
+                    <a class="list-group-item list-group-item-action active" id="list-diskio-list" data-toggle="list" href="#list-diskio" role="tab" aria-controls="diskio">Disk IO</a>
+                    <a class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
+                    <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
+                    <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+                </div>
+            </div>
+            <div class="col-9">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="graph" role="tabpanel" aria-labelledby="list-graph-list">...</div>
+                    <div id="legend"></div>
+                </div>
+            </div>
+        </div>    
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="libs/jquery3.3.1/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="libs/popper/popper.js"  crossorigin="anonymous"></script>
+    <script src="libs/bootstrap-4.1.0-dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="libs/dygraph2.1.0/dygraph.min.js"></script>
+    <script src="js/charts.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>AnalyseIfx</title>
+    <!-- css -->
+    <link rel="stylesheet" href="libs/bootstrap-4.1.0-dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="libs/dygraph2.1.0/dygraph.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">AnalyseIfx</a>
+        
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">Charts<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item disabled">
+                <a class="nav-link" href="clientadmin.html">Client Admin<span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="chartadmin.html">Chart Admin</a>
+            </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <!--clients-->
+            <div class="col-3">client
+                <div class="list-group itemgroup" id="clients">
+                    
+                </div>
+            </div>
+
+            <!--hosts-->
+            <div class="col-3">host
+                <div class="list-group itemgroup" id="hosts">
+                    
+                </div>
+            </div>
+            
+            <!--instances-->
+            <div class="col-3">instance
+                <div class="list-group itemgroup" id="instances">
+
+                </div>
+            </div>
+
+            <!--files-->
+            <div class="col-3">Date
+                <div class="list-group itemgroup" id="dates">
+
+                </div>
+            </div>
+            
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-3">
+            Actions   
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-outline-secondary" id="delete">Delete</button>
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-outline-secondary" id="edit">Edit</button>
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-outline-secondary" id="new">New</button>
+            </div>
+        </div>
+
+
+    </div>
+    
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="libs/jquery3.3.1/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script src="libs/popper/popper.js" crossorigin="anonymous"></script>
+    <script src="libs/bootstrap-4.1.0-dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="libs/dygraph2.1.0/dygraph.min.js"></script>
+    <script src="js/clientadmin.js"></script>
+</body>
+</html>
