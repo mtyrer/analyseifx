@@ -9,6 +9,23 @@ class Analysedb extends CI_Model {
         $this->load->database();
     }
 
+    public function client_delete($client) {
+        // step one is to delete all of the instances on the host
+
+        $client_id = $this->client_id_get($client);
+
+        $hosts = $this->hosts_get($client);
+
+        foreach ($hosts as $row) {
+            $this->host_delete($client, $row->host_name);
+        }
+
+        $sql = "delete from client where id = ?";
+
+        // step two is to delete the host
+        $query3 = $this->db->query($sql, array($client_id));
+    }
+
     public function client_id_get($client_name) {
         
         $sql = "SELECT id FROM client where client_name = ? order by client_name";
@@ -77,9 +94,9 @@ class Analysedb extends CI_Model {
     public function host_delete($client, $host) {
         // step one is to delete all of the instances on the host
 
-        $hosts = $this->client_id_get($client);
+        $client_id = $this->client_id_get($client);
 
-        $sql = "select * from host where client_id = ? and host_name = ?";
+        $sql = "select id from host where client_id = ? and host_name = ?";
 
         $query = $this->db->query($sql, array($client_id, $host));
 
@@ -97,15 +114,6 @@ class Analysedb extends CI_Model {
 
         // step two is to delete the host
         $query3 = $this->db->query($sql3, array($hostid));
-
-    }
-
-    public function host_id_get($host_name) {
-    
-    $sql = "SELECT id FROM host where host_name = ?";
-        $query = $this->db->query($sql, array($host_name)); 
-
-        return $query->row()->id;
     }
     
     public function hosts_get($client)
@@ -116,6 +124,14 @@ class Analysedb extends CI_Model {
         $this->db->order_by("host_name");
         $query = $this->db->get('host');
         return $query->result();
+    }
+
+    public function host_id_get($host_name) {
+    
+        $sql = "SELECT id FROM host where host_name = ?";
+        $query = $this->db->query($sql, array($host_name)); 
+
+        return $query->row()->id;
     }
 
     // delete the date 

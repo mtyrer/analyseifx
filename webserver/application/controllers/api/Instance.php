@@ -56,7 +56,6 @@ class Instance extends REST_Controller {
 
     public function instance_delete($instance_id) {
        
-
         $result = $this->analysedb->instance_delete($instance_id);
 
         if ($result === 0) {

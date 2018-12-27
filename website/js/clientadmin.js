@@ -96,18 +96,18 @@ function populateClients() {
             //<button type="button" class="list-group-item list-group-item-action">Cras justo odio</button>
             if (first) {
             
-                html += ' <button type="button" class="list-group-item list-group-item-action item_group active" data-id="' + val["id"] + '">' + 
-                    val["client_name"]  + '</button>';
+                html += ' <button type="button" class="list-group-item list-group-item-action item_group active" data-id="' + val.id + '">' + 
+                    val.client_name  + '</button>';
 
                 first = false;
             } else {
-                html += ' <button type="button" class="list-group-item list-group-item-action item_group" data-id="' + val["id"] + '">' + 
-                    val["client_name"]  + '</button>';
+                html += ' <button type="button" class="list-group-item list-group-item-action item_group" data-id="' + val.id + '">' + 
+                    val.client_name  + '</button>';
             }
         }) ;
 
         $("#clients").html(html);    
-        setCurrClient(data[0]["client_name"]);
+        setCurrClient(data[0].client_name);
         
     } ).fail (function ( jqxhdr, textStatus, error) {
         //console.log(textStatus, error, jqxhdr);
@@ -137,19 +137,19 @@ function populateHost() {
             //html += '<a class="dropdown-item dditem" href="#">' + val["host_name"]  + '</a>';
             if (first) {
 
-                html += ' <button type="button" class="list-group-item list-group-item-action item_group active" data-id="' + val["id"] + '">' + 
-                    val["host_name"]  + '</button>';
+                html += ' <button type="button" class="list-group-item list-group-item-action item_group active" data-id="' + val.id + '">' + 
+                    val.host_name  + '</button>';
 
                 first = false;
             } else {
-              html += ' <button type="button" class="list-group-item list-group-item-action item_group" data-id="' + val["id"] + '">' + 
-                val["host_name"]  + '</button>';
+              html += ' <button type="button" class="list-group-item list-group-item-action item_group" data-id="' + val.id + '">' + 
+                val.host_name  + '</button>';
             }
         });
 
         $("#hosts").html(html);
         
-        setCurrHost(data[0]["host_name"]);
+        setCurrHost(data[0].host_name);
 
     } ).fail (function ( jqxhdr, textStatus, error) {
         //console.log(textStatus, error, jqxhdr);
@@ -178,17 +178,17 @@ function populateInstance() {
         $.each (data, function(key, val) {
 
             if (first) {
-                html += ' <button type="button" class="list-group-item list-group-item-action item_group active" data-id="' + val["id"] + '">' + 
-                val["instance_name"]  + '</button>';
+                html += ' <button type="button" class="list-group-item list-group-item-action item_group active" data-id="' + val.id + '">' + 
+                val.instance_name  + '</button>';
                 first=false;
             } else {
-                html += ' <button type="button" class="list-group-item list-group-item-action item_group" data-id="' + val["id"] + '">' + 
-                val["instance_name"]  + '</button>';
+                html += ' <button type="button" class="list-group-item list-group-item-action item_group" data-id="' + val.id + '">' + 
+                val.instance_name  + '</button>';
             }
         }) ;
         //console.log(html);
         $("#instances").html(html);
-        setCurrInstance(data[0]["instance_name"], data[0]["id"]);
+        setCurrInstance(data[0].instance_name, data[0].id);
         
     } ).fail (function ( jqxhdr, textStatus, error) {
         //console.log(textStatus, error, jqxhdr);
@@ -210,7 +210,7 @@ function populateDates() {
     $.getJSON("http://localhost/analyseifx/webserver/index.php/api/date/dates/" + currInstanceID, function (data) {
         
     } ).done (function (data) {
-        var html = "";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   "";
+        var html = "";
         var first = false;
         var retdate;
         //console.log("date: " + data[0]);    
@@ -247,6 +247,55 @@ function setCurrDate(setdate) {
 
     DateSet.resolve();
     
+}
+
+function delete_client(InstanceElement) {
+
+    //
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+    //
+    
+    var proceed = confirm("Delete the client for real? :" + currClient );
+
+    if (proceed) {
+        // remove
+        $.ajax({
+            url: 'http://localhost/analyseifx/webserver/index.php/api/client/client/' + currClient,
+            type: 'DELETE'
+        }).done (function (data) {
+            alert('The Client has left the house!!');
+            //console.log (data[0]);            
+            populateClients();
+        }).fail (function ( jqxhdr, textStatus, error) {
+            console.log(textStatus, error, jqxhdr);
+        });    
+    }
+
+
+}
+
+function delete_date(dateElement) {
+    
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+    //
+    
+    var proceed = confirm("Delete the data for real? :" + currDate + " on " + currInstance );
+    
+    if (proceed) {
+        // remove
+        $.ajax({
+            url: 'http://localhost/analyseifx/webserver/index.php/api/date/date/' + currInstanceID + "/" + currDate,
+            type: 'DELETE'
+        }).done (function (data) {
+            alert('File has left the house!!');
+            //console.log (data[0]);            
+            populateDates();
+        }).fail (function ( jqxhdr, textStatus, error) {
+            console.log(textStatus, error, jqxhdr);
+        });    
+    }
 }
 
 function delete_host(InstanceElement) {
@@ -289,29 +338,6 @@ function delete_instance(InstanceElement) {
             alert('File has left the house!!');
             //console.log (data[0]);            
             populateInstance();
-        }).fail (function ( jqxhdr, textStatus, error) {
-            console.log(textStatus, error, jqxhdr);
-        });    
-    }
-}
-
-function delete_date(dateElement) {
-    
-    // gather the required information to delete.  
-    // the following is require in order to delete for the date
-    //
-    
-    var proceed = confirm("Delete the data for real? :" + currDate + " on " + currInstance );
-
-    if (proceed) {
-        // remove
-        $.ajax({
-            url: 'http://localhost/analyseifx/webserver/index.php/api/date/date/' + currInstanceID + "/" + currDate,
-            type: 'DELETE'
-        }).done (function (data) {
-            alert('File has left the house!!');
-            //console.log (data[0]);            
-            populateDates();
         }).fail (function ( jqxhdr, textStatus, error) {
             console.log(textStatus, error, jqxhdr);
         });    

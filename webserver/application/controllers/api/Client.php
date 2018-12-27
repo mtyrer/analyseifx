@@ -53,4 +53,22 @@ class Client extends REST_Controller {
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
+
+    public function client_delete($client) {
+       
+
+        $result = $this->analysedb->client_delete($client);
+
+        if ($result === 0) {
+
+            $message = [
+                'client' => $client,
+                'message' => 'Deleted the client'
+            ];
+    
+            $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
+        } else {
+            $this->response("Failed to delete data for the client $client", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+        }
+    }
 }

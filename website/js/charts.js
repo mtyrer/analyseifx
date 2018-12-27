@@ -268,9 +268,10 @@ function displayGraph(data) {
     var title = graphs[currGraph]["graph_title"];
     var min = Number.MAX_VALUE;
     var max = -Number.MAX_VALUE;
+    var i;
     
     //console.log(Number.MIN_VALUE);
-    for (var i=0; i < seriesCount; i++) {
+    for ( i=0; i < seriesCount; i++) {
 
         if (data[i].data.length == 0) {
             seriesCount = i;
@@ -283,6 +284,7 @@ function displayGraph(data) {
         labels.push(data[i].series_label);
     }
     
+    // iterate through the data rows
     for (var cnt=0;  cnt < data[0].data.length; cnt++) {
 
         var dataval = [];
@@ -297,21 +299,31 @@ function displayGraph(data) {
 
         timediff = +dt - basetime;
         basetime = +dt;
+        var pushdata=true;
 
-        for (var i=0; i < seriesCount; i++) {
-
-                        
+        // iterate through the data columns
+        for (i=0; i < seriesCount; i++) {
+                
             var value = data[i].data[cnt].datum;
             rollperiod = data[i].average;
+
             if (data[i].series_type == "difference") {
                 dataval[i] = +value - baseval[i];
+
+                if (dataval[i] < 0 ) {
+                    pushdata=false;
+                }
                 
                 baseval[i] = +value;
             } else {
                 if (data[i].series_type == "time diff" ){   
                     dataval[i] = (+value - baseval[i]) / timediff;
                     baseval[i] = +value;
-                         
+                    
+                    if (dataval[i] < 0 ) {
+                        pushdata=false;
+                    }
+
                 } else {
                     dataval[i] = +value;
                 }
@@ -332,12 +344,12 @@ function displayGraph(data) {
             }
             items.push(dataval[i]);
             //console.log(items);   
-        }
+        } // end of the iteration across the columns
         
-        text.push(items);
+        if (pushdata == true) text.push(items);
     
-    }
-
+    } // end of the iteration across the rows
+    
     if (max == min) {
         max += 10;
         min -= 10;
