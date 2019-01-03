@@ -58,13 +58,14 @@
             <!--files-->
             <div class="col-3">Date
                 <div class="list-group itemgroup" id="dates">
+                    
 
                 </div>
             </div>
             
         </div>
         <hr>
-        <div class="row">
+        <div class="row" id="actions">
             <div class="col-3">
             Actions   
             </div>
@@ -78,8 +79,30 @@
                 <button type="button" class="btn btn-outline-secondary" id="new">New</button>
             </div>
         </div>
+        <div class="defaulthide" id="modifyform">
+            <form>
+                <div class="form-group" id="inputcustomer">
+                    <label for="">Customer</label>
+                    <input type="text" class="form-control" id="customer_txt" aria-describedby="customerHelp" placeholder="Customer ">
+                    <small id="customerHelp" class="form-text text-muted">Customer Name</small>
+                </div>
 
+                <div class="form-group" id="inputhost">
+                    <label for="">Host</label>
+                    <input type="text" class="form-control" id="host_txt" aria-describedby="hostHelp" placeholder="Host ">
+                    <small id="hostHelp" class="form-text text-muted">Host Name</small>
+                </div>
 
+                <div class="form-group" id="inputinstance">
+                    <label for="">Instance</label>
+                    <input type="text" class="form-control" id="instance_txt" aria-describedby="instanceHelp" placeholder="Instance ">
+                    <small id="instanceHelp" class="form-text text-muted">Instance Name</small>
+                </div>
+               
+                <button type="button" class="btn btn-primary" id="edit_submit">Submit</button>
+                <button type="button" class="btn btn-primary" id="edit_cancel">Cancel</button>
+            </form>
+        </div>
     </div>
     
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

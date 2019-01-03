@@ -9,6 +9,7 @@ var currGraph="";
 var graphs;
 var currSeries;
 var lastButton;
+var editAction="none";
 
 
 $(document).ready(function () {
@@ -76,6 +77,57 @@ $(document).ready(function () {
                 break;
             } 
         }
+    });
+
+    $("#edit").click(function() {
+        if (lastButton) {
+            console.log(lastButton.html());
+            var id = $(lastButton).parent().attr('id');
+            console.log ("id: " + id);
+            switch (id) {
+            case 'clients':
+                console.log("Update client:" + lastButton.html() );
+                set_update_client(lastButton.html());                        
+                break;
+            case 'hosts':
+                console.log("Update host:" + lastButton.html() + " for " + currClient);          
+                set_update_host(lastButton.html());
+                break;
+            case 'instances':
+                var instID = lastButton.data("id");  
+                console.log("Update instance:" + lastButton.html() + " on " + currHost + " for " + currClient);        
+                set_update_instance(lastButton.html());
+                break;
+            case 'dates':
+                //console.log("Update " + lastButton.html() + " from instance " + currInstance + " on " + currHost + " for " + currClient);    
+                //update_date(lastButton.data('id'));
+                break;
+            } 
+        }
+    });
+
+    $("#edit_submit").click(function () {
+        var newval;
+        switch (editAction) {
+            case 'instance' :
+                newval=$("#instance_txt").val();
+                if (newval == currInstance) {
+                    console.log("no change");
+                } else {
+                    console.log("instance " + newval);
+                    update_instance(newval);
+                }
+                break;
+        }
+        
+        hide_edit();
+        buttons_show();
+        
+    });
+
+    $("#edit_cancel").click(function () {
+        hide_edit();
+        buttons_show();
     });
 });
 
@@ -325,7 +377,6 @@ function delete_instance(InstanceElement) {
     
     // gather the required information to delete.  
     // the following is require in order to delete for the date
-    //
     
     var proceed = confirm("Delete the instance for real? :" + currInstance );
 
@@ -342,4 +393,52 @@ function delete_instance(InstanceElement) {
             console.log(textStatus, error, jqxhdr);
         });    
     }
+}
+
+function set_update_instance(InstanceElement) {
+
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+
+    editAction = "instance";
+
+    $("#inputcustomer").hide();
+    $("#inputhost").hide();
+    $("#inputinstance").show();
+    $("#instance_txt").val(currInstance);
+
+    show_edit("instance");
+}
+ 
+function update_instance(instance_name) {
+
+    $.post('http://localhost/analyseifx/webserver/index.php/api/instance/instance/', 
+        {action:'update', id:currInstanceID, name:instance_name})
+        .done (function (data) {
+            alert('instance has been updated!!');
+            //console.log (data[0]);            
+            populateInstance();
+        }).fail (function ( jqxhdr, textStatus, error) {
+            console.log(textStatus, error, jqxhdr);
+        });    
+
+}
+
+function show_edit(edit) {
+
+    $("#modifyform").show();
+    buttons_hide();
+}
+
+function hide_edit() {
+    $("#modifyform").hide();
+    buttons_show();
+}
+
+function buttons_hide() {
+    $("#actions").hide();
+}
+
+function buttons_show() {
+    $("#actions").show();
 }
