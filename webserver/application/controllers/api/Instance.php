@@ -71,16 +71,31 @@ class Instance extends REST_Controller {
         }
     }
 
+    public function instance_exists_name_get($client, $host, $instance) {
+
+        if ($this->analysedb->instance_exists_name($client, $host, $instance)) {
+            $retval = ['instace_exits' => 'exist'];
+        } else {
+            $retval = ['instace_exits' => 'not exist'];
+        }
+        $this->set_response($retval, REST_Controller::HTTP_OK);
+    }
+
     public function instance_post() {
        
         $action = $this->post("action");
         $id = $this->post("id");
         $name = $this->post("name");
-        $result = 1;
+        
+        $result = FALSE;
 
+        if ($action == "update") {
+            $result = $this->analysedb->instance_update_name($id, $name);
+        }
+        
         //$result = $this->analysedb->instance_delete($instance_id);
 
-        if ($result === 0) {
+        if ($result === TRUE) {
 
             $message = [
                 'instance_id' => $id,

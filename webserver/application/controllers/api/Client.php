@@ -29,7 +29,7 @@ class Client extends REST_Controller {
         // Configure limits on our controller methods
         // Ensure you have created the 'limits' table and enabled 'limits' within application/config/rest.php
         $this->methods['clients_get']['limit'] = 500; // 500 requests per hour per user/key
-        //$this->methods['users_post']['limit'] = 100; // 100 requests per hour per user/key
+        $this->methods['client_post']['limit'] = 100; // 100 requests per hour per user/key
         //$this->methods['users_delete']['limit'] = 50; // 50 requests per hour per user/key
         //$this->load->model('analysedb');
 
@@ -71,4 +71,43 @@ class Client extends REST_Controller {
             $this->response("Failed to delete data for the client $client", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
     }
+
+    public function client_exists_name_get($client) {
+
+        if ($this->analysedb->client_exists_client_short_name($client)) {
+            $retval = ['client_exits' => 'exist'];
+        } else {
+            $retval = ['client_exits' => 'not exist'];
+        }
+        $this->set_response($retval, REST_Controller::HTTP_OK);
+    }
+
+    public function client_post() {
+       
+        //get the parsed in arguments
+        $action = $this->post("action");
+        $client_name_new = $this->post("client_name_new");
+
+        // set the default return value
+        $result = FALSE;
+
+        // if we are doing an update
+        if ($action == "update") {
+            $client_name_old = $this->post("client_name_old");
+            $result = $this->analysedb->client_update_names($client_name_old, $client_name_new);
+        }
+        
+        if ($result === TRUE) {
+
+            $message = [
+                'client_name' => $client_name_new,
+                'message' => 'Updated the client'
+            ];
+    
+            $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
+        } else {
+            $this->response("Failed to update data for the client $client_name_old", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+        }
+    }
+
 }

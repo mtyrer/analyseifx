@@ -70,4 +70,39 @@ class Host extends REST_Controller {
             $this->response("Failed to delete data for the host $host", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
     }
+
+    public function host_exists_name_get($client, $host) {
+
+        if ($this->analysedb->host_exists_host_short_name($client, $host)) {
+            $retval = ['host_exits' => 'exist'];
+        } else {
+            $retval = ['host_exits' => 'not exist'];
+        }
+        $this->set_response($retval, REST_Controller::HTTP_OK);
+    }
+
+    public function host_post() {
+       
+        $action = $this->post("action");
+        $client = $this->post("client");
+        $host_name_new = $this->post("host_name_new");
+        $result = FALSE;
+
+        if ($action == "update") {
+            $host_name_old = $this->post("host_name_old");
+            $result = $this->analysedb->host_update_names($client, $host_name_old, $host_name_new);
+        }
+        
+        if ($result === TRUE) {
+
+            $message = [
+                'host_name' => $host_name_new,
+                'message' => 'Updated the host'
+            ];
+    
+            $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
+        } else {
+            $this->response("Failed to update data for the host $host_name_old", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+        }
+    }
 }

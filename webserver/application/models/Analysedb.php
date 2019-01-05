@@ -26,6 +26,20 @@ class Analysedb extends CI_Model {
         $query3 = $this->db->query($sql, array($client_id));
     }
 
+    //check if the client exists
+    public function client_exists_client_short_name($client) {
+        
+        $sql = "select count(*) as countr 
+        from client 
+        where client.client_short_name = ?";
+
+        $query = $this->db->query($sql, array($client));
+        $row = $query->row();
+        $retval = $row->countr;
+
+        return $retval > 0;
+    }
+
     public function client_id_get($client_name) {
         
         $sql = "SELECT id FROM client where client_name = ? order by client_name";
@@ -38,6 +52,18 @@ class Analysedb extends CI_Model {
     {
         $query = $this->db->get('client');
         return $query->result();
+    }
+
+    public function client_update_names($client_old, $client_new) {
+
+        $client_id = $this->client_id_get($client_old);
+
+        $this->db->where('id', $client_id);
+        $this->db->set('client_short_name', $client_new);
+        $this->db->set('client_name', $client_new);
+        $retval = $this->db->update('client');
+
+        return $retval;
     }
 
     // delete the date 
@@ -116,6 +142,21 @@ class Analysedb extends CI_Model {
         $query3 = $this->db->query($sql3, array($hostid));
     }
     
+    public function host_exists_host_short_name($client, $host) {
+        
+        $sql = "select count(*) as countr 
+        from host, client 
+        where host_short_name = ? 
+        and host.client_id = client.id 
+        and client.client_short_name = ?";
+
+        $query = $this->db->query($sql, array($host, $client));
+        $row = $query->row();
+        $retval = $row->countr;
+
+        return $retval > 0;
+    }
+
     public function hosts_get($client)
     {
         $client_id = $this->client_id_get($client);
@@ -126,12 +167,26 @@ class Analysedb extends CI_Model {
         return $query->result();
     }
 
+
     public function host_id_get($host_name) {
     
         $sql = "SELECT id FROM host where host_name = ?";
         $query = $this->db->query($sql, array($host_name)); 
 
         return $query->row()->id;
+    }
+
+    public function host_update_names($client, $host_old, $host_new) {
+
+        $client_id = $this->client_id_get($client);
+
+        $this->db->where('client_id', $client_id);
+        $this->db->where('host_short_name', $host_old);
+        $this->db->set('host_short_name', $host_new);
+        $this->db->set('host_name', $host_new);
+        $retval = $this->db->update('host');
+
+        return $retval;
     }
 
     // delete the date 
@@ -157,6 +212,23 @@ class Analysedb extends CI_Model {
         $query = $this->db->query($sql); 
     }
 
+    public function instance_exists_name($client, $host, $instance) {
+        
+        $sql = "select count(*) as countr 
+        from instance, host, client 
+        where instance_name = ? 
+        and host.id = instance.host_id 
+        and host_short_name = ? 
+        and host.client_id = client.id 
+        and client.client_short_name = ?";
+
+        $query = $this->db->query($sql, array($instance, $host, $client));
+        $row = $query->row();
+        $retval = $row->countr;
+
+        return $retval > 0;
+    }
+
     public function instances_get($host)
     {
         $host_id = $this->host_id_get($host);
@@ -167,6 +239,15 @@ class Analysedb extends CI_Model {
         return $query->result();
     }
 
+
+    public function instance_update_name($id, $name) {
+
+        $this->db->where('id', $id);
+        $this->db->set('instance_name', $name);
+        $retval = $this->db->update('instance');
+
+        return $retval;
+    }
     
     public function metric_get($instanceid, $metric_id, $date) {
         $sql = "SELECT metric_date, data FROM metric_data_".$instanceid." where instance_id = ? and metric_header_id = ? and DATE(metric_date) = ? order by metric_date";

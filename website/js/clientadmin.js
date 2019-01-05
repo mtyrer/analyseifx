@@ -1,3 +1,13 @@
+// Client Admin
+// delete, insert and update of data
+//
+// This phase will be the basics
+// 
+// Other phases to do list - merging instances, hosts and clients
+//                         - moving hosts and instances
+//                         - capturing information about the hosts and instances
+
+
 var currClient="none";
 var currHost="none";
 var currInstance="none";
@@ -24,7 +34,8 @@ $(document).ready(function () {
         $(this).addClass("active");
         lastButton = $(this);
 
-        console.log(id);
+       
+        //item selector - client, host, instance or date
         switch (id) {
         case 'clients':
             //if (currClient != value) {
@@ -52,6 +63,7 @@ $(document).ready(function () {
         }
     });
     
+    // click on the delete button
     $("#delete").click(function() {
         if (lastButton) {
             console.log(lastButton.html());
@@ -79,6 +91,7 @@ $(document).ready(function () {
         }
     });
 
+    //click on the edit button
     $("#edit").click(function() {
         if (lastButton) {
             console.log(lastButton.html());
@@ -116,6 +129,24 @@ $(document).ready(function () {
                 } else {
                     console.log("instance " + newval);
                     update_instance(newval);
+                }
+                break;
+            case 'host' :
+                newval=$("#host_txt").val();
+                if (newval == currHost) {
+                    console.log("no change");
+                } else {
+                    console.log("host " + newval);
+                    update_host(newval);
+                }
+                break;
+            case 'client' :
+                newval=$("#customer_txt").val();
+                if (newval == currClient) {
+                    console.log("no change");
+                } else {
+                    console.log("client " + newval);
+                    update_client(newval);
                 }
                 break;
         }
@@ -412,16 +443,146 @@ function set_update_instance(InstanceElement) {
  
 function update_instance(instance_name) {
 
-    $.post('http://localhost/analyseifx/webserver/index.php/api/instance/instance/', 
-        {action:'update', id:currInstanceID, name:instance_name})
-        .done (function (data) {
-            alert('instance has been updated!!');
-            //console.log (data[0]);            
-            populateInstance();
-        }).fail (function ( jqxhdr, textStatus, error) {
-            console.log(textStatus, error, jqxhdr);
-        });    
+    var update=false;
+    
+    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instance_exists_name/" + currClient + "/" + currHost + "/" + instance_name, function (data) {
+        
+    } ).done (function (data, json) {
+        
+        $.each (data, function(key, val) {
 
+            if (val.instance_exists == "exists") {
+                //check if the user wants to merge the datasets  
+                update=false;
+                alert("Instance Already Exists. Merging of instances has not as yet been implemented ");
+            } else {
+                update=true;
+            }
+        }) ;
+
+        if (update) {
+
+            $.post('http://localhost/analyseifx/webserver/index.php/api/instance/instance/', 
+            {action:'update', id:currInstanceID, name:instance_name})
+            .done (function (data) {
+                alert('instance has been updated!!');
+                //console.log (data[0]);            
+                populateInstance();
+            }).fail (function ( jqxhdr, textStatus, error) {
+                console.log(textStatus, error, jqxhdr);
+            });    
+        }
+       
+        
+    } ).fail (function ( jqxhdr, textStatus, error) {
+        //console.log(textStatus, error, jqxhdr);
+    });
+    
+}
+
+function set_update_host(HostElement) {
+
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+
+    editAction = "host";
+
+    $("#inputcustomer").hide();
+    $("#inputhost").show();
+    $("#inputinstance").hide();
+    $("#host_txt").val(currHost);
+
+    show_edit("host");
+}
+ 
+function update_host(host_name) {
+
+    var update=false;
+    
+    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/host/host_exists_name/" + currClient + "/" + host_name, function (data) {
+        
+    } ).done (function (data, json) {
+        
+        $.each (data, function(key, val) {
+
+            if (val.host_exists == "exists") {
+                //check if the user wants to merge the datasets  
+                update=false;
+                alert("Host already exists. Merging hosts has not as yet been implemented");
+            } else {
+                update=true;
+            }
+        }) ;
+
+        if (update) {
+
+            $.post('http://localhost/analyseifx/webserver/index.php/api/host/host/', 
+            {action:'update', client:currClient, host_name_old:currHost, host_name_new:host_name})
+            .done (function (data) {
+                alert('host has been updated!!');
+                //console.log (data[0]);            
+                populateHost();
+            }).fail (function ( jqxhdr, textStatus, error) {
+                console.log(textStatus, error, jqxhdr);
+            });    
+        }
+       
+        
+    } ).fail (function ( jqxhdr, textStatus, error) {
+        //console.log(textStatus, error, jqxhdr);
+    });
+}
+
+function set_update_client(ClientElement) {
+
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+
+    editAction = "client";
+
+    $("#inputcustomer").show();
+    $("#inputhost").hide();
+    $("#inputinstance").hide();
+    $("#customer_txt").val(currClient);
+
+    show_edit("client");
+}
+ 
+function update_client(client_name) {
+
+    var update=false;
+    
+    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/client/client_exists_name/" + client_name, function (data) {
+        
+    } ).done (function (data, json) {
+        
+        $.each (data, function(key, val) {
+
+            if (val.client_exists == "exists") {
+                //check if the user wants to merge the datasets  
+                update=false;
+                alert("Client already exists. Merging clients has not as yet been implemented");
+            } else {
+                update=true;
+            }
+        }) ;
+
+        if (update) {
+
+            $.post('http://localhost/analyseifx/webserver/index.php/api/client/client/', 
+            {action:'update', client_name_old:currClient, client_name_new:client_name})
+            .done (function (data) {
+                alert('client has been updated!!');
+                //console.log (data[0]);            
+                populateClients();
+            }).fail (function ( jqxhdr, textStatus, error) {
+                console.log(textStatus, error, jqxhdr);
+            });    
+        }
+        
+    } ).fail (function ( jqxhdr, textStatus, error) {
+        //console.log(textStatus, error, jqxhdr);
+    });
 }
 
 function show_edit(edit) {
