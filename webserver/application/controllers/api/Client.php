@@ -59,7 +59,7 @@ class Client extends REST_Controller {
 
         $result = $this->analysedb->client_delete($client);
 
-        if ($result === 0) {
+        if ($result) {
 
             $message = [
                 'client' => $client,
@@ -68,7 +68,12 @@ class Client extends REST_Controller {
     
             $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
         } else {
-            $this->response("Failed to delete data for the client $client", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+            $message = [
+                'client' => $client,
+                'message' => "Failed to delete data for the client $client",
+                'result' => $result
+            ];
+            $this->response($message, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
     }
 
@@ -95,15 +100,27 @@ class Client extends REST_Controller {
         if ($action == "update") {
             $client_name_old = $this->post("client_name_old");
             $result = $this->analysedb->client_update_names($client_name_old, $client_name_new);
+
+            $message = [
+                'client_name' => $client_name_new,
+                'message' => '$action the client. Successful'
+            ];
+        }
+
+        if ($action == "add") {
+            $resultarr = $this->analysedb->client_add($client_name_new);
+            $result = $resultarr[0];
+            $insertid = $resultarr[1];
+
+            $message = [
+                'client_name' => $client_name_new,
+                'message' => '$action the client. Successful',
+                'insertid' => $insertid
+            ];
         }
         
         if ($result === TRUE) {
 
-            $message = [
-                'client_name' => $client_name_new,
-                'message' => 'Updated the client'
-            ];
-    
             $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
         } else {
             $this->response("Failed to update data for the client $client_name_old", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code

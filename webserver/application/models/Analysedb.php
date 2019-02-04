@@ -9,6 +9,18 @@ class Analysedb extends CI_Model {
         $this->load->database();
     }
 
+    public function client_add($client_name)
+    {
+
+        $this->db->set('client_short_name', $client_name);
+        $this->db->set('client_name', $client_name);
+        
+        $retval = $this->db->insert('client');
+        $last_id = $this->db->insert_id();
+
+        return array($retval, $last_id);
+    }
+
     public function client_delete($client) {
         // step one is to delete all of the instances on the host
 
@@ -17,13 +29,17 @@ class Analysedb extends CI_Model {
         $hosts = $this->hosts_get($client);
 
         foreach ($hosts as $row) {
-            $this->host_delete($client, $row->host_name);
+            if ( ! $this->host_delete($client, $row->host_name)) {
+                return;
+            }
         }
 
         $sql = "delete from client where id = ?";
 
         // step two is to delete the host
-        $query3 = $this->db->query($sql, array($client_id));
+        $result = $this->db->query($sql, array($client_id));
+
+        return $result;
     }
 
     //check if the client exists
@@ -133,13 +149,17 @@ class Analysedb extends CI_Model {
         $query2 = $this->db->query($sql2, array($hostid));
 
         foreach ($query2->result() as $row) {
-            $this->instance_delete($row->id);
+            if (! $this->instance_delete($row->id)) {
+                return false;
+                break;
+            }
         }
 
         $sql3 = "delete from host where id = ?";
 
         // step two is to delete the host
-        $query3 = $this->db->query($sql3, array($hostid));
+        $result = $this->db->query($sql3, array($hostid));
+        return $result;
     }
     
     public function host_exists_host_short_name($client, $host) {
@@ -209,7 +229,7 @@ class Analysedb extends CI_Model {
 
         $sql = "DROP TABLE $table";
 
-        $query = $this->db->query($sql); 
+        return $this->db->query($sql); 
     }
 
     public function instance_exists_name($client, $host, $instance) {

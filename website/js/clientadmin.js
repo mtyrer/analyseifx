@@ -119,10 +119,38 @@ $(document).ready(function () {
         }
     });
 
+    // New stuff
+    $("#new").click(function() {
+        if (lastButton) {
+            console.log(lastButton.html());
+            var id = $(lastButton).parent().attr('id');
+            console.log ("id: " + id);
+            switch (id) {
+            case 'clients':
+                console.log("New client:" + lastButton.html() );
+                set_new_client(lastButton.html());                        
+                break;
+            case 'hosts':
+                console.log("New host:" + lastButton.html() + " for " + currClient);          
+                set_new_host(lastButton.html());
+                break;
+            case 'instances':
+                var instID = lastButton.data("id");  
+                console.log("New instance:" + lastButton.html() + " on " + currHost + " for " + currClient);        
+                set_new_instance(lastButton.html());
+                break;
+            case 'dates':
+                //console.log("Update " + lastButton.html() + " from instance " + currInstance + " on " + currHost + " for " + currClient);    
+                //update_date(lastButton.data('id'));
+                break;
+            } 
+        }
+    });
+
     $("#edit_submit").click(function () {
         var newval;
         switch (editAction) {
-            case 'instance' :
+            case 'updateinstance' :
                 newval=$("#instance_txt").val();
                 if (newval == currInstance) {
                     console.log("no change");
@@ -131,7 +159,7 @@ $(document).ready(function () {
                     update_instance(newval);
                 }
                 break;
-            case 'host' :
+            case 'updatehost' :
                 newval=$("#host_txt").val();
                 if (newval == currHost) {
                     console.log("no change");
@@ -140,13 +168,22 @@ $(document).ready(function () {
                     update_host(newval);
                 }
                 break;
-            case 'client' :
+            case 'updateclient' :
                 newval=$("#customer_txt").val();
                 if (newval == currClient) {
                     console.log("no change");
                 } else {
                     console.log("client " + newval);
-                    update_client(newval);
+                    update_client(newval, "update");
+                }
+                break;
+            case 'addclient' :
+                newval=$("#customer_txt").val();
+                if (newval == "") {
+                    console.log("no entry");
+                } else {
+                    console.log("new client " + newval);
+                    update_client(newval, "add");
                 }
                 break;
         }
@@ -431,7 +468,7 @@ function set_update_instance(InstanceElement) {
     // gather the required information to delete.  
     // the following is require in order to delete for the date
 
-    editAction = "instance";
+    editAction = "updateinstance";
 
     $("#inputcustomer").hide();
     $("#inputhost").hide();
@@ -485,7 +522,7 @@ function set_update_host(HostElement) {
     // gather the required information to delete.  
     // the following is require in order to delete for the date
 
-    editAction = "host";
+    editAction = "updatehost";
 
     $("#inputcustomer").hide();
     $("#inputhost").show();
@@ -533,12 +570,27 @@ function update_host(host_name) {
     });
 }
 
+function set_new_client(ClientElement) {
+
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+
+    editAction = "addclient";
+
+    $("#inputcustomer").show();
+    $("#inputhost").hide();
+    $("#inputinstance").hide();
+    $("#customer_txt").val("");
+
+    show_edit("client");
+}
+
 function set_update_client(ClientElement) {
 
     // gather the required information to delete.  
     // the following is require in order to delete for the date
 
-    editAction = "client";
+    editAction = "updateclient";
 
     $("#inputcustomer").show();
     $("#inputhost").hide();
@@ -548,7 +600,7 @@ function set_update_client(ClientElement) {
     show_edit("client");
 }
  
-function update_client(client_name) {
+function update_client(client_name, action) {
 
     var update=false;
     
@@ -561,7 +613,13 @@ function update_client(client_name) {
             if (val.client_exists == "exists") {
                 //check if the user wants to merge the datasets  
                 update=false;
-                alert("Client already exists. Merging clients has not as yet been implemented");
+                if (action == "update") {
+                    alert("Client already exists. Merging clients has not as yet been implemented");
+                }
+                if (action == "add") {
+                    alert("Client already exists. If we add the client again, I will get dizzy");
+                }
+
             } else {
                 update=true;
             }
@@ -570,10 +628,10 @@ function update_client(client_name) {
         if (update) {
 
             $.post('http://localhost/analyseifx/webserver/index.php/api/client/client/', 
-            {action:'update', client_name_old:currClient, client_name_new:client_name})
+            {action:action, client_name_old:currClient, client_name_new:client_name})
             .done (function (data) {
-                alert('client has been updated!!');
-                //console.log (data[0]);            
+                alert('action, client has been updated!!');
+                console.log (data[0]);            
                 populateClients();
             }).fail (function ( jqxhdr, textStatus, error) {
                 console.log(textStatus, error, jqxhdr);
