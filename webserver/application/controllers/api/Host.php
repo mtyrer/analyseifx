@@ -58,7 +58,7 @@ class Host extends REST_Controller {
         
         $result = $this->analysedb->host_delete($client, $host);
 
-        if ($result === 0) {
+        if ($result) {
 
             $message = [
                 'host' => $host,
@@ -86,23 +86,35 @@ class Host extends REST_Controller {
         $action = $this->post("action");
         $client = $this->post("client");
         $host_name_new = $this->post("host_name_new");
+        $host_name_old = $this->post("host_name_old");
         $result = FALSE;
 
         if ($action == "update") {
             $host_name_old = $this->post("host_name_old");
             $result = $this->analysedb->host_update_names($client, $host_name_old, $host_name_new);
-        }
-        
-        if ($result === TRUE) {
-
             $message = [
                 'host_name' => $host_name_new,
                 'message' => 'Updated the host'
             ];
-    
+        }
+
+        if ($action == "add") {
+            $resultarr = $this->analysedb->host_add($client, $host_name_new);
+            $result = $resultarr[0];
+            $insertid = $resultarr[1];
+            $host_name_old = $host_name_new;
+
+            $message = [
+                'host_name' => $host_name_new,
+                'message' => '$action the host. Successful',
+                'insertid' => $insertid
+            ];
+        }
+        
+        if ($result === TRUE) {
             $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
         } else {
-            $this->response("Failed to update data for the host $host_name_old", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+            $this->response("Failed to $action data for the host $host_name_old", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
     }
 }

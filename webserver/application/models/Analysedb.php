@@ -133,6 +133,20 @@ class Analysedb extends CI_Model {
         return $query->result();
     }
     
+    public function host_add($client, $host_name)
+    {
+        $client_id = $this->client_id_get($client);
+
+        $this->db->set('host_short_name', $host_name);
+        $this->db->set('host_name', $host_name);
+        $this->db->set('client_id', $client_id);
+        
+        $retval = $this->db->insert('host');
+        $last_id = $this->db->insert_id();
+
+        return array($retval, $last_id);
+    }
+    
     public function host_delete($client, $host) {
         // step one is to delete all of the instances on the host
 

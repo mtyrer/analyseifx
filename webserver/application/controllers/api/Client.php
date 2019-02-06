@@ -111,6 +111,7 @@ class Client extends REST_Controller {
             $resultarr = $this->analysedb->client_add($client_name_new);
             $result = $resultarr[0];
             $insertid = $resultarr[1];
+            $client_name_old = $client_name_new;
 
             $message = [
                 'client_name' => $client_name_new,

@@ -165,7 +165,16 @@ $(document).ready(function () {
                     console.log("no change");
                 } else {
                     console.log("host " + newval);
-                    update_host(newval);
+                    update_host(newval, "update");
+                }
+                break;
+            case 'addhost' :
+                newval=$("#host_txt").val();
+                if (newval == "") {
+                    console.log("no change");
+                } else {
+                    console.log("new host " + newval);
+                    update_host(newval, "add");
                 }
                 break;
             case 'updateclient' :
@@ -432,7 +441,7 @@ function delete_host(InstanceElement) {
             url: 'http://localhost/analyseifx/webserver/index.php/api/host/host/' + currClient + "/" + currHost,
             type: 'DELETE'
         }).done (function (data) {
-            alert('File has left the house!!');
+            alert('Host has left the house!!');
             //console.log (data[0]);            
             populateHost();
         }).fail (function ( jqxhdr, textStatus, error) {
@@ -517,6 +526,21 @@ function update_instance(instance_name) {
     
 }
 
+function set_new_host(HostElement) {
+
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+
+    editAction = "addhost";
+
+    $("#inputcustomer").hide();
+    $("#inputhost").show();
+    $("#inputinstance").hide();
+    $("#host_txt").val("");
+
+    show_edit("host");
+}
+
 function set_update_host(HostElement) {
 
     // gather the required information to delete.  
@@ -532,7 +556,7 @@ function set_update_host(HostElement) {
     show_edit("host");
 }
  
-function update_host(host_name) {
+function update_host(host_name, action) {
 
     var update=false;
     
@@ -545,7 +569,14 @@ function update_host(host_name) {
             if (val.host_exists == "exists") {
                 //check if the user wants to merge the datasets  
                 update=false;
-                alert("Host already exists. Merging hosts has not as yet been implemented");
+
+                if (action == "add") {
+                    alert("Host already exists. I cannot squeeze in a host with the same name");
+                } 
+
+                if (action == "update") {
+                    alert("Host already exists. Merging hosts has not as yet been implemented");
+                }
             } else {
                 update=true;
             }
@@ -554,9 +585,15 @@ function update_host(host_name) {
         if (update) {
 
             $.post('http://localhost/analyseifx/webserver/index.php/api/host/host/', 
-            {action:'update', client:currClient, host_name_old:currHost, host_name_new:host_name})
+            {action:action, client:currClient, host_name_old:currHost, host_name_new:host_name})
             .done (function (data) {
-                alert('host has been updated!!');
+                if (action == "update") {
+
+                    alert('host has been updated!!');
+                }
+                if (action == "add") {
+                    alert("host has been added!!");
+                }
                 //console.log (data[0]);            
                 populateHost();
             }).fail (function ( jqxhdr, textStatus, error) {
