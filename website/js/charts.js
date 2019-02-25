@@ -151,9 +151,8 @@ function setCurrHost(host) {
 
 function populateInstance() {
 
-    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instances/" + currHost, function (data) {
-        
-    } ).done (function (data, json) {
+    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instances/", {'host':currHost, 'client':currClient})
+    .done (function (data, json) {
         html = "";
         
        

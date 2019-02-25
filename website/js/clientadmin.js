@@ -119,25 +119,25 @@ $(document).ready(function () {
         }
     });
 
-    // New stuff
-    $("#new").click(function() {
+    // Add stuff
+    $("#add").click(function() {
         if (lastButton) {
             console.log(lastButton.html());
             var id = $(lastButton).parent().attr('id');
             console.log ("id: " + id);
             switch (id) {
             case 'clients':
-                console.log("New client:" + lastButton.html() );
-                set_new_client(lastButton.html());                        
+                console.log("Add client:" + lastButton.html() );
+                set_add_client(lastButton.html());                        
                 break;
             case 'hosts':
-                console.log("New host:" + lastButton.html() + " for " + currClient);          
-                set_new_host(lastButton.html());
+                console.log("Add host:" + lastButton.html() + " for " + currClient);          
+                set_add_host(lastButton.html());
                 break;
             case 'instances':
                 var instID = lastButton.data("id");  
-                console.log("New instance:" + lastButton.html() + " on " + currHost + " for " + currClient);        
-                set_new_instance(lastButton.html());
+                console.log("Add instance:" + lastButton.html() + " on " + currHost + " for " + currClient);        
+                set_add_instance(lastButton.html());
                 break;
             case 'dates':
                 //console.log("Update " + lastButton.html() + " from instance " + currInstance + " on " + currHost + " for " + currClient);    
@@ -150,13 +150,22 @@ $(document).ready(function () {
     $("#edit_submit").click(function () {
         var newval;
         switch (editAction) {
+            case 'addinstance' :
+                newval=$("#instance_txt").val();
+                if (newval == currInstance) {
+                    console.log("no change");
+                } else {
+                    console.log("instance " + newval);
+                    update_instance(newval, "add");
+                }
+                break;
             case 'updateinstance' :
                 newval=$("#instance_txt").val();
                 if (newval == currInstance) {
                     console.log("no change");
                 } else {
                     console.log("instance " + newval);
-                    update_instance(newval);
+                    update_instance(newval, "update");
                 }
                 break;
             case 'updatehost' :
@@ -173,7 +182,7 @@ $(document).ready(function () {
                 if (newval == "") {
                     console.log("no change");
                 } else {
-                    console.log("new host " + newval);
+                    console.log("add host " + newval);
                     update_host(newval, "add");
                 }
                 break;
@@ -191,7 +200,7 @@ $(document).ready(function () {
                 if (newval == "") {
                     console.log("no entry");
                 } else {
-                    console.log("new client " + newval);
+                    console.log("add client " + newval);
                     update_client(newval, "add");
                 }
                 break;
@@ -298,9 +307,7 @@ function populateInstance() {
     $("#instances").html("");
     $("#dates").html("");
 
-    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instances/" + currHost, function (data) {
-        
-    } ).done (function (data, json) {
+    $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instances/", {'host':currHost, 'client':currClient}).done (function (data, json) {
         var html = "";
         var first = false;
        
@@ -486,10 +493,27 @@ function set_update_instance(InstanceElement) {
 
     show_edit("instance");
 }
+
+function set_add_instance(InstanceElement) {
+
+    // gather the required information to delete.  
+    // the following is require in order to delete for the date
+
+    editAction = "addinstance";
+
+    $("#inputcustomer").hide();
+    $("#inputhost").hide();
+    $("#inputinstance").show();
+    $("#instance_txt").val("");
+
+    show_edit("instance");
+}
  
-function update_instance(instance_name) {
+function update_instance(instance_name, action) {
 
     var update=false;
+    var message={};
+    var jsonval;
     
     $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instance_exists_name/" + currClient + "/" + currHost + "/" + instance_name, function (data) {
         
@@ -500,16 +524,21 @@ function update_instance(instance_name) {
             if (val.instance_exists == "exists") {
                 //check if the user wants to merge the datasets  
                 update=false;
-                alert("Instance Already Exists. Merging of instances has not as yet been implemented ");
+                if (action == "update") {
+                    alert("Instance Already Exists. Merging of instances has not as yet been implemented ");
+                }
+                if (action == "add") {
+                    alert("Instance Already Exists. We don't want too many instances ");
+                }
             } else {
                 update=true;
             }
-        }) ;
+        });
 
         if (update) {
-
+            
             $.post('http://localhost/analyseifx/webserver/index.php/api/instance/instance/', 
-            {action:'update', id:currInstanceID, name:instance_name})
+            {action:action, id:currInstance, name:instance_name, host:currHost, client:currClient})
             .done (function (data) {
                 alert('instance has been updated!!');
                 //console.log (data[0]);            
@@ -518,15 +547,13 @@ function update_instance(instance_name) {
                 console.log(textStatus, error, jqxhdr);
             });    
         }
-       
-        
     } ).fail (function ( jqxhdr, textStatus, error) {
-        //console.log(textStatus, error, jqxhdr);
+        console.log(textStatus, error, jqxhdr);
     });
     
 }
 
-function set_new_host(HostElement) {
+function set_add_host(HostElement) {
 
     // gather the required information to delete.  
     // the following is require in order to delete for the date
@@ -607,7 +634,7 @@ function update_host(host_name, action) {
     });
 }
 
-function set_new_client(ClientElement) {
+function set_add_client(ClientElement) {
 
     // gather the required information to delete.  
     // the following is require in order to delete for the date

@@ -202,10 +202,12 @@ class Analysedb extends CI_Model {
     }
 
 
-    public function host_id_get($host_name) {
+    public function host_id_get($host_name, $client_name) {
     
-        $sql = "SELECT id FROM host where host_name = ?";
-        $query = $this->db->query($sql, array($host_name)); 
+        $client_id = $this->client_id_get($client_name);
+
+        $sql = "SELECT id FROM host where host_name = ? and client_id = ?";
+        $query = $this->db->query($sql, array($host_name, $client_id)); 
 
         return $query->row()->id;
     }
@@ -222,6 +224,22 @@ class Analysedb extends CI_Model {
 
         return $retval;
     }
+
+    public function instance_add($instance_name, $host_name, $client_name)
+    {
+        
+        $host_id=$this->analysedb->host_id_get($host_name, $client_name);
+
+        $this->db->set('instance_name', $instance_name);
+        $this->db->set('host_id', $host_id);
+        
+        $retval = $this->db->insert('instance');
+        $last_id = $this->db->insert_id();
+
+        return array($retval, $last_id);
+    }
+
+    
 
     // delete the date 
     public function instance_delete($instanceid) {
@@ -241,7 +259,7 @@ class Analysedb extends CI_Model {
 
         }
 
-        $sql = "DROP TABLE $table";
+        $sql = "DROP TABLE IF EXISTS $table";
 
         return $this->db->query($sql); 
     }
@@ -263,9 +281,10 @@ class Analysedb extends CI_Model {
         return $retval > 0;
     }
 
-    public function instances_get($host)
+    public function instances_get($host, $client)
     {
-        $host_id = $this->host_id_get($host);
+        
+        $host_id = $this->host_id_get($host, $client);
 
         $this->db->where("host_id", $host_id);
         $this->db->order_by("instance_name");

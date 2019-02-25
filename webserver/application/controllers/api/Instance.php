@@ -35,10 +35,13 @@ class Instance extends REST_Controller {
 
     }
 
-    public function instances_get($host)
+    public function instances_get()
     {
+        $host=$this->get('host');
+        $client=$this->get('client');
+
         // Users from a data store e.g. database
-        $instances = $this->analysedb->instances_get($host);
+        $instances = $this->analysedb->instances_get($host, $client);
         if ($instances)
         {
             // Set the response and exit
@@ -58,7 +61,7 @@ class Instance extends REST_Controller {
        
         $result = $this->analysedb->instance_delete($instance_id);
 
-        if ($result === 0) {
+        if ($result) {
 
             $message = [
                 'instance_id' => $instance_id,
@@ -83,28 +86,48 @@ class Instance extends REST_Controller {
 
     public function instance_post() {
        
+        #phpinfo();
         $action = $this->post("action");
-        $id = $this->post("id");
+        
         $name = $this->post("name");
         
         $result = FALSE;
 
         if ($action == "update") {
+            $id = $this->post("id");
             $result = $this->analysedb->instance_update_name($id, $name);
+            $message = [
+                'instance_name' => $name,
+                'message' => 'updated the instance'
+            ];
         }
-        
-        //$result = $this->analysedb->instance_delete($instance_id);
 
-        if ($result === TRUE) {
+        if ($action == "add") {
+            $host=$this->post("host");
+            $client=$this->post("client");
+            
+            $resultarr = $this->analysedb->instance_add($name, $host, $client);
+            $result = $resultarr[0];
+            $insertid = $resultarr[1];
 
             $message = [
-                'instance_id' => $id,
+                'instance_id' => $insertid,
                 'message' => 'Updated the instance'
             ];
+        } 
     
+    
+        //$result = $this->analysedb->instance_delete($instance_id);
+        
+        if ($result === TRUE) {
             $this->set_response($message, REST_Controller::HTTP_OK); // NO_CONTENT (204) being the HTTP response code
         } else {
-            $this->response("Failed to update data for the instance $id", REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
+            $message = [
+                'text' => 'Sad. Something bad happened',
+                'action' => $action,
+                'instance_name' => $name 
+            ];
+            $this->response($message, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
         }
     }
 }
