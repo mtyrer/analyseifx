@@ -7,6 +7,8 @@ from os.path import basename
 import mysql.connector
 import sys, getopt
 import time
+import gzip
+import csv
 
 def is_number(s):
   try:
@@ -256,6 +258,7 @@ def main(argv):
     sys.exit()
 
   # let us check if the file exists
+  print ("Checking file path")
   file_exists = Path(filename)
 
   try:
@@ -263,15 +266,22 @@ def main(argv):
   except FileNotFoundError:
     sys.exit("File not found")
 
+  print ("Getting the client id")
   client_id = get_client_id(client)
+  print("Getting the host id")
   host_id = get_host_id(client_id, host)
+  print("Getting the instance id")
   instance_id = get_instance_id (host_id, instance)
 
-  f = open(filename, "r")
+  print("Processing the file - open")
+  f = gzip.open(filename, "rt")
 
+
+  reader = csv.reader(f, delimiter='|')
   # get the headings from the file 
-  line = f.readline()
-  headings = line.split("|")
+  headings = next(reader)
+  print(headings)
+  #headings = line.split("|")
 
   metric_ids =  get_metric_ids(headings)
 
@@ -288,11 +298,11 @@ def main(argv):
 
     filedate = ""
 
-    for line in f:
+    for fields in reader:
       counter = counter + 1
-      #split the row into metrics
-      fields = line.split("|")
-      # create the date time field
+      
+      #print(fields)
+
       fdate = fields[0].split("/")
       metricdatetime = "20" + fdate[2] + "-" + fdate[1] + "-" + fdate[0] + " " + fields[1]
 
@@ -308,8 +318,7 @@ def main(argv):
 
       print(metricdatetime)
       
-      for i, field in enumerate(fields):
-      
+      for i, field in enumerate(fields):      
         if is_number(field):    
           v = (instance_id, metricdatetime, instance_id, metric_ids[i], counter, field)    
           #error handling
