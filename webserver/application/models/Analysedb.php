@@ -95,7 +95,7 @@ class Analysedb extends CI_Model {
         // Ok - let's drop the partition
         $sql = "ALTER TABLE $table DROP PARTITION $partition";
 
-        $query = $this->db->query($sql); 
+        return $this->db->query($sql); 
     }
 
     // date to partition 
@@ -109,7 +109,7 @@ class Analysedb extends CI_Model {
     // get the dates 
     public function dates_get($instanceid) {
 
-        $sql = "SELECT partition_name FROM information_schema.partitions where table_name = ? and table_rows > 0 order by partition_name";
+        $sql = "SELECT partition_name FROM information_schema.partitions where table_name = ? and table_rows > 0 order by partition_name desc";
         
         $table_name = "metric_data_" . $instanceid;
         

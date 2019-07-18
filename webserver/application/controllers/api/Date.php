@@ -60,7 +60,7 @@ class Date extends REST_Controller {
 
         $result = $this->analysedb->date_delete($instance_id, $date);
 
-        if ($result === 0) {
+        if ($result) {
 
             $message = [
                 'date' => $date,

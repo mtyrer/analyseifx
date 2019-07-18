@@ -262,7 +262,7 @@ def main(argv):
   file_exists = Path(filename)
 
   try:
-    file_path = file_exists.resolve()
+    file_exists.resolve()
   except FileNotFoundError:
     sys.exit("File not found")
 

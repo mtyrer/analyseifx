@@ -62,28 +62,6 @@ $(document).ready(function () {
             break;
         }
 
-        $("#test-upload").fileinput({
-            'theme': 'fas',
-            'showPreview': false,
-            'allowedFileExtensions': ['jpg', 'png', 'gif'],
-            'elErrorContainer': '#errorBlock'
-        });
-        $("#kv-explorer").fileinput({
-            'theme': 'explorer-fas',
-            'uploadUrl': '#',
-            overwriteInitial: false,
-            initialPreviewAsData: true,
-            initialPreview: [
-                "http://lorempixel.com/1920/1080/nature/1",
-                "http://lorempixel.com/1920/1080/nature/2",
-                "http://lorempixel.com/1920/1080/nature/3"
-            ],
-            initialPreviewConfig: [
-                {caption: "nature-1.jpg", size: 329892, width: "120px", url: "{$url}", key: 1},
-                {caption: "nature-2.jpg", size: 872378, width: "120px", url: "{$url}", key: 2},
-                {caption: "nature-3.jpg", size: 632762, width: "120px", url: "{$url}", key: 3}
-            ]
-        });
     });
     
     // click on the delete button
@@ -238,13 +216,6 @@ $(document).ready(function () {
         hide_edit();
         buttons_show();
     });
-});
-
-$("#file-0").fileinput({
-    theme: 'fas',
-    uploadUrl: '#'
-}).on('filepreupload', function(event, data, previewId, index) {
-    alert('The description entered is:\n\n' + ($('#description').val() || ' NULL'));
 });
 
 function populateClients() {

@@ -291,14 +291,15 @@ function displayGraph(data) {
         var datetime = data[0].data[cnt].date;
         var rollperiod = 1;
         var dt = new Date(datetime);
-        
 
         // load time as the first data input for the graph
         items.push(dt);
 
-        timediff = +dt - basetime;
+        var timediff = (+dt - basetime) / 1000;
+        //console.log ("base: " + basetime + " date: " + dt + " diff: " + timediff  );
         basetime = +dt;
         var pushdata=true;
+
 
         // iterate through the data columns
         for (i=0; i < seriesCount; i++) {
