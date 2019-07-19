@@ -323,7 +323,6 @@ function displayGraph(data) {
                     if (dataval[i] < 0 ) {
                         pushdata=false;
                     }
-
                 } else {
                     dataval[i] = +value;
                 }
