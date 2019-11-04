@@ -285,7 +285,7 @@ def main(argv):
 
   metric_ids =  get_metric_ids(headings)
 
-  SQL="insert into metric_data_%s(metric_date, instance_id, metric_header_id, seq_no, data) values ( %s , %s, %s , %s, %s )"
+  SQL="insert ignore into metric_data_%s(metric_date, instance_id, metric_header_id, seq_no, data) values ( %s , %s, %s , %s, %s )"
 
   try:
     mydb = get_connection()
@@ -322,16 +322,15 @@ def main(argv):
         if is_number(field):    
           v = (instance_id, metricdatetime, instance_id, metric_ids[i], counter, field)    
           #error handling
-          mycursor.execute(SQL, v)
-    
+          mycursor.execute(SQL, v) 
 
       mydb.commit()
 
-    SQL="INSERT INTO `analyseifx`.`row_sequence` (`instance_id`,`date`,`counter`) VALUES (%s, %s, %s)"
+    #SQL="INSERT INTO `analyseifx`.`row_sequence` (`instance_id`,`date`,`counter`) VALUES (%s, %s, %s)"
 
-    v=(instance_id, filedate, counter)
+    #v=(instance_id, filedate, counter)
 
-    mycursor.execute(SQL, v)
+    #mycursor.execute(SQL, v)
   except mysql.connector.Error as e:
     print(e)
   finally:

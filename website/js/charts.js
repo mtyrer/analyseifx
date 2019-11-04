@@ -233,6 +233,7 @@ function getGraph() {
     $.when(InstanceSet, DateSet).done (function () {
         
         $.getJSON("http://localhost/analyseifx/webserver/index.php/api/series/series/" + graphs[currGraph]["id"] + "/" + currInstanceID + "/" + currDate)
+        //$.getJSON("http://localhost/analyseifx/webserver/index.php/api/series/series_json/" + graphs[currGraph]["id"] + "/" + currInstanceID + "/" + currDate)
         .done (function (data) {
             //currSeries = data;
             var returned = JSON.parse(data);
@@ -260,26 +261,26 @@ function displayGraph(data) {
     var graph_type = graphs[currGraph]["graph_type"];
     var isStacked = (graph_type == "STACKED"); 
 
-   // console.log ("isStacked " + isStacked + " " + graph_type + " " + graphs[currGraph]["graph_type"]);
-
-    var seriesCount = data.length;
+    var seriesCount = data.length; // number of lines on the graph
 
     var title = graphs[currGraph]["graph_title"];
     var min = Number.MAX_VALUE;
     var max = -Number.MAX_VALUE;
     var i;
     
-    //console.log(Number.MIN_VALUE);
+    // for each line on the graph
     for ( i=0; i < seriesCount; i++) {
 
+        // check that the line has some data
         if (data[i].data.length == 0) {
             seriesCount = i;
             break;
         }
 
+        //set the baseval for each line - used with difference and time diff
         baseval[i] = +data[i].data[0].datum;
-        //console.log("baseval " + baseval[i]);
         
+        //add the label names
         labels.push(data[i].series_label);
     }
     
@@ -296,8 +297,10 @@ function displayGraph(data) {
         items.push(dt);
 
         var timediff = (+dt - basetime) / 1000;
+        
         //console.log ("base: " + basetime + " date: " + dt + " diff: " + timediff  );
         basetime = +dt;
+        
         var pushdata=true;
 
 

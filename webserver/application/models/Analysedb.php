@@ -1,5 +1,7 @@
 <?php
 
+use \jlawrence\eos\Parser;
+
 class Analysedb extends CI_Model {
         
     function __construct()
@@ -309,6 +311,25 @@ class Analysedb extends CI_Model {
         return $query->result();
     }
 
+    public function metric_json_get($instanceid, $metric_id, $date) {
+
+        $metric_name = metricheadername_get($metric_id);
+
+        $sql = "SELECT metric_date, data->>'$.'" + $metric_name +  "' FROM metrics where instance_id = ? DATE(metric_date) = ? order by metric_date";
+        $query = $this->db->query($sql, array($intanceid, $metric_id, $date));
+        
+        return $query->result();
+    
+    }
+
+    public function metricheadername_get($metric_id) {
+
+        $sql = "SELECT metric_name FROM metric_header where id = ?";
+        $query = $this->db->query($sql, array($metric_id)); 
+
+        return $query->row()->metric_name;
+    }        
+
     public function metricheaderid_get($metric_name) {
 
         $sql = "SELECT id FROM metric_header where metric_name = ?";
@@ -397,7 +418,151 @@ class Analysedb extends CI_Model {
 
         return $returnset;   
     }
+    
+    public function seriesjson_get($graph_id, $instanceid, $targetdate) {
         
+        $this->db->reconnect();
+        
+        # ----- TO DO --- Currently ignoring series sets ---- needs to be added back or redesigned ------
+        #$sql = "SELECT * FROM series_json left outer join series_set ON id = series_id where graph_id = ?";
+        $sql = "SELECT * FROM series_json where graph_id = ?;";
+        
+        $query = $this->db->query($sql, array($graph_id));
+
+        $returnset = [];
+        
+
+        $table_name = "metrics";
+        $querytype="select";
+
+        $ssql = "select * from metrics where DATE(mdate) = ? and instance = ?";
+
+        $qr = $query->result();
+
+        foreach ($qr as $series_row) {
+            
+            if (stripos($series_row->calc, "call" ) === 0) {
+                $querytype="call";
+            } else {
+                $querytype="select";
+            }
+
+            $metrics = [];
+            $set_array = [];
+            $set_label = [];
+            $isset = false;
+
+            # ---- TO DO ---- More series set stuff to put back
+            if ($series_row->action == "matches") {
+            
+                $mhsql = "select name from metric_header_json where name REGEXP ? and instance_id = ?";
+                $mhquery = $this->db->query($mhsql, array($series_row->calc, $instanceid));
+
+                foreach ($mhquery->result() as $field) {
+                    $metrics[$field] = [];
+
+            #    $setquery = $this->db->query($series_row->sql);
+            #    foreach ($setquery->result() as $header) {
+            #        array_push($set_array, $header->metric_name);
+            #        if ($header->label != NULL) {
+            #            array_push($set_label, $header->label);
+            #        } else {
+            #            array_push($set_label, $header->metric_name);
+            #        }
+                 }
+                 $isset = true;
+
+            } else {
+                
+                $metrics['once'] = [''];
+
+                array_push($set_array, "once");
+            }
+            
+            foreach ($set_array as $key=>$metric_header)
+            {
+                $row = 0;
+                $retobj = new \stdClass();
+                $retobj->series_type = $series_row->series_types_name;
+                $retobj->average = $series_row->average;
+                $retobj->series_label = $series_row->series_label;
+                
+                $s_query = $this->db->query($ssql, array($targetdate, $instanceid));
+                
+                //$eq = new eqEOS();
+                
+                //return $ssql;
+                
+                $var=$series_row->calc;
+                $metrics = [];
+                foreach ($s_query->result() as $row) {
+                    
+                    $row = $row + 1;
+                    $json = json_decode($row->data); 
+                    $metric = new \stdClass();
+                    $metric->date = $row->mdate;
+
+                    if ($isset && $row == 1) {
+                        $s_query = $this->db->query($ssql, array($targetdate, $metric_header));
+                        
+                        #set up the arrays and values 
+                        foreach ($json as $key => $value) {
+                            #--------------------------------------------------############# Work Here ###############
+                            #if ($key )
+                            #echo "$key => $value\n";
+                        }
+
+                        $retobj->series_label = $set_label[$key];
+                    } else {
+                        //$sql = str_replace(':', 'data->"$', $series_row->calc);
+                        //$sql = "Select mdate, data from metrics where mdate = ? and instance = ?";
+                        
+                        //print $sql;
+                    }
+
+                    switch ($series_row->action) {
+                        case "equals":
+                            //$metric->datum =  ${$series_row->calc};
+                            $metric->datum =  $json->$var;
+                            array_push($metrics, $metric);
+                            break;
+
+                        case "solve":
+                            $metric->datum = eval ('return '.$series_row->calc .";");
+                            array_push($metrics, $metric);
+                            break;
+                        case "matches":
+                            foreach ($json as $key => $value) {
+                                echo "$key => $value\n";
+                            }
+                                
+                            array_push($metrics, $metric);
+
+                        default:
+                            $metric->datum = 0;
+                    }
+                    #$metric->datum = $json_obj->{$series_row->calc};
+                    #$metric->datum = Parser::SolveIF($json->{$series_row->calc});     
+                }
+                
+                if ($querytype === "call") {
+                    $s_query->next_result();
+                }
+                
+                $s_query->free_result();
+
+                if (count($metrics) > 0) {
+                    $retobj->data = $metrics;
+                    array_push($returnset, $retobj);
+                } 
+            }
+        }
+        
+        $query->free_result();
+
+        return $returnset;   
+    }
+
 }
 
 ?>

@@ -18,3 +18,7 @@
 .defaulthide {
     display: none;
 }
+
+.statfile-loading {
+    display: none;
+}

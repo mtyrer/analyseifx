@@ -54,4 +54,24 @@ class Series extends REST_Controller {
             ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
         }
     }
+
+    public function series_json_get($graph_id, $instanceid, $date)
+    {
+  
+        // Users from a data store e.g. database
+        $series = $this->analysedb->seriesjson_get($graph_id, $instanceid, $date);
+        if ($series)
+        {
+            // Set the response and exit
+            $this->response(json_encode($series), REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
+        }
+        else
+        {
+            // Set the response and exit
+            $this->response([
+                'status' => FALSE,
+                'message' => 'No series were found for graph ' . $graph_id . ', instanceid ' . $instanceid . ' and date ' . $date
+            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
+        }
+    }
 }

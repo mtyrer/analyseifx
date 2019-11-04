@@ -15,7 +15,8 @@
 	},
 	"require": {
 		"php": ">=5.4.0",
-		"codeigniter/framework": "^3.0.4"
+		"codeigniter/framework": "^3.0.4",
+		"jlawrence/eos": "3.*"
 	},
 	"autoload": {
 		"classmap": [
@@ -26,4 +27,5 @@
 			"Restserver\\Libraries\\" : "application/libraries/"
 		}
 	}
+
 }

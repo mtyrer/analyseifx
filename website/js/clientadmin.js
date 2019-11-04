@@ -20,13 +20,35 @@ var graphs;
 var currSeries;
 var lastButton;
 var editAction="none";
+var extrafiledata;
 
+
+    $("#statfiles").fileinput({
+        'uploadAsync': false,
+        'uploadUrl': "http://localhost/analyseifx/bin/fileuploader.php", 
+        'theme': 'fas',
+        'previewFileType':'any',
+        'uploadExtraData': function() {
+            return {
+                client: currClient, 
+                host: currHost,
+                instance: currInstance
+            };
+        }
+    }).on('fileuploaded', function(event, previewId, index, fileId) {
+        console.log('File Uploaded');
+    }).on('fileuploaderror', function(event, data, msg) {
+        console.log('File Upload Error');
+    }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
+        console.log('File Batch Uploaded');
+    });
 
 $(document).ready(function () {
     // Step one - populate the drop downs with the first available client, host and instance
-
-    populateClients();
     
+    populateClients();
+   
+
     $(document).on("click", ".item_group", function () {
         var id = $(this).parent().attr('id');
         var value = $(this).text();
@@ -118,6 +140,8 @@ $(document).ready(function () {
                 break;
             } 
         }
+
+        
     });
 
     // Add stuff
@@ -206,7 +230,20 @@ $(document).ready(function () {
                 }
                 break;
         }
-        
+    
+        $("#statfiles").fileinput({
+            'uploadAsync': false,
+            'uploadUrl': "http://localhost/analyseifx/bin/fileuploader.php", 
+            'theme': 'fas',
+            'previewFileType':'any'
+        }).on('fileuploaded', function(event, previewId, index, fileId) {
+            console.log('File Uploaded');
+        }).on('fileuploaderror', function(event, data, msg) {
+            console.log('File Upload Error');
+        }).on('filebatchuploadcomplete', function(event, preview, config, tags, extraData) {
+            console.log('File Batch Uploaded');
+        });
+
         hide_edit();
         buttons_show();
         
@@ -216,6 +253,14 @@ $(document).ready(function () {
         hide_edit();
         buttons_show();
     });
+
+    // file-loader logic 
+    // initialize with defaults
+    
+ 
+    // with plugin options
+    //$("#input-id").fileinput({'showUpload':false, 'previewFileType':'any'});
+
 });
 
 function populateClients() {
@@ -258,6 +303,7 @@ function setCurrClient(client) {
     currClient = client;
 
     populateHost();
+    HideFileUpdate();
 }
 
 function populateHost() {
@@ -270,7 +316,7 @@ function populateHost() {
         
     } ).done (function (data, json) {
         var html = "";
-        var first=false;
+        var first=true;
         
         $.each (data, function(key, val) {
             //html += '<a class="dropdown-item dditem" href="#">' + val["host_name"]  + '</a>';
@@ -300,6 +346,7 @@ function setCurrHost(host) {
     currHost = host;
 
     populateInstance();
+    HideFileUpdate();
 
 }
 
@@ -310,7 +357,7 @@ function populateInstance() {
 
     $.getJSON("http://localhost/analyseifx/webserver/index.php/api/instance/instances/", {'host':currHost, 'client':currClient}).done (function (data, json) {
         var html = "";
-        var first = false;
+        var first = true;
        
         $.each (data, function(key, val) {
 
@@ -338,6 +385,7 @@ function setCurrInstance(instance, instanceID) {
 
     InstanceSet.resolve();
     populateDates();
+    ShowFileUpdate();
 }
 
 function populateDates() {
@@ -348,7 +396,7 @@ function populateDates() {
         
     } ).done (function (data) {
         var html = "";
-        var first = false;
+        var first = true;
         var retdate;
         //console.log("date: " + data[0]);    
         $.each (data, function(key, val) {
@@ -384,6 +432,17 @@ function setCurrDate(setdate) {
 
     DateSet.resolve();
     
+}
+
+function ShowFileUpdate() {
+    extrafiledata={'client': currClient, 
+                   'host': currHost,
+                    'instance': currInstance};
+    $(".statfile-loading").show();
+}
+
+function HideFileUpdate() {
+    $(".statfile-loading").hide();
 }
 
 function delete_client(InstanceElement) {
@@ -727,14 +786,5 @@ function buttons_show() {
     $("#actions").show();
 }
 
-$(".btn-warning").on('click', function () {
-    var $el = $("#file-4");
-    if ($el.attr('disabled')) {
-        $el.fileinput('enable');
-    } else {
-        $el.fileinput('disable');
-    }
-});
-$(".btn-info").on('click', function () {
-    $("#file-4").fileinput('refresh', {previewClass: 'bg-info'});
-});
+
+
